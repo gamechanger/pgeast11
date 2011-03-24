@@ -41,7 +41,3 @@ function iterate() {
 function iterateLater() {
     window.setTimeout("iterate()", 1000 );
 }
-
-$(document).ready(function() {
-    iterateLater();
-});

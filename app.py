@@ -10,7 +10,7 @@ class Root:
     @cherrypy.expose
     def index(self):
         return """
-<a href="lru">Start</a>
+<a href="/simple">OMG WOW</a>
 <div style="width:400px; margin:0px auto 0px auto; text-align: center; border: thin solid #ccc; background-color: #eee;">
 <h1>Scaling from Toys to Traffic</h1>
 <br/>
@@ -23,6 +23,19 @@ CTO, GameChanger Media.
 jobs@gc.io
 </div>
 """
+
+    @cherrypy.expose
+    def simple(self):
+        return """
+<a href="/lru">LRU</a>
+<div style="width:400px; margin: 0px auto 0px auto; padding: 20px; border: thin solid #ccc; background-color: #eee; font-family:mono;">
+<pre>
+team = {"name": "NYC Jaguars", "sport": "baseball"}
+mongo.datadb.team.save(team) # omg wow
+</pre>
+<br/>
+</div>
+        """
 
     @cherrypy.expose
     def lru(self):
@@ -44,7 +57,7 @@ jobs@gc.io
 #output { margin: 10px auto 0px auto; width: 250px; }
 #controls { margin: 0px auto 0px auto; width: 250px; text-align: center; }
 </style>
-<a href="/lru2">Next</a>
+<a href="/lru2">MOAR</a>
 <div id="upper" class="container">
 </div>
 <div id="lower" class="container">
@@ -58,7 +71,7 @@ jobs@gc.io
 <div id="h" class="block">H</div>
 </div>
 <div id="controls">
-<a href="javascript:window.random=false;">Nice</a> | <a href="javascript:window.random=true;">Not Nice</a>
+<a href="javascript:iterateLater()">Start</a> | <a href="javascript:window.random=false;">Nice</a> | <a href="javascript:window.random=true;">Not Nice</a>
 </div>
 <div id="output"></div>
 """
@@ -83,7 +96,7 @@ jobs@gc.io
 #output { margin: 10px auto 0px auto; width: 250px; }
 #controls { margin: 0px auto 0px auto; width: 250px; text-align: center; }
 </style>
-<a href="/users">Next</a>
+<a href="/users">Growing Up</a>
 <div id="upper" class="container">
 </div>
 <div id="lower" class="container">
@@ -97,7 +110,7 @@ jobs@gc.io
 <div id="h" class="block">3456</div>
 </div>
 <div id="controls">
-<a href="javascript:window.random=false;">Nice</a> | <a href="javascript:window.random=true;">Not Nice</a>
+<a href="javascript:iterateLater()">Start</a> | <a href="javascript:window.random=false;">Nice</a> | <a href="javascript:window.random=true;">Not Nice</a>
 </div>
 <div id="output"></div>
 """
