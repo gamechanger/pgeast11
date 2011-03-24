@@ -8,20 +8,31 @@ import cherrypy
 class Root:
     @cherrypy.expose
     def index(self):
-        return ""
+        return """
+<a href="lru">Start</a>
+"""
 
     @cherrypy.expose
     def lru(self):
         return """
 <script src="jquery-1.4.2.min.js"></script>
+<script src="lru.js"></script>
 <style>
 .container { background-color: #eee; border: thin solid #ccc; height: 35px; padding: 10px; width: 250px; margin: 0px auto 0px auto; }
+#lower { height: 55px; }
 .block { height: 15px; padding: 5px; border: thin solid #ccc; text-align: center; width: 50px; float: left; }
 #a { background-color: pink; }
 #b { background-color: lightblue; }
 #c { background-color: lightgreen; }
 #d { background-color: orange; }
+#e { background-color: red; color: white; }
+#f { background-color: darkgreen; color: white; }
+#g { background-color: yellow; }
+#h { background-color: purple; color: white; }
+#output { margin: 10px auto 0px auto; width: 250px; }
+#controls { margin: 0px auto 0px auto; width: 250px; text-align: center; }
 </style>
+<a href="/lru2">Next</a>
 <div id="upper" class="container">
 </div>
 <div id="lower" class="container">
@@ -29,9 +40,54 @@ class Root:
 <div id="b" class="block">B</div>
 <div id="c" class="block">C</div>
 <div id="d" class="block">D</div>
+<div id="e" class="block">E</div>
+<div id="f" class="block">F</div>
+<div id="g" class="block">G</div>
+<div id="h" class="block">H</div>
 </div>
-<script>
-</script>
+<div id="controls">
+<a href="javascript:window.random=false;">Nice</a> | <a href="javascript:window.random=true;">Not Nice</a>
+</div>
+<div id="output"></div>
+"""
+
+    @cherrypy.expose
+    def lru2(self):
+        return """
+<script src="jquery-1.4.2.min.js"></script>
+<script src="lru2.js"></script>
+<style>
+.container { background-color: #eee; border: thin solid #ccc; height: 35px; padding: 10px; width: 250px; margin: 0px auto 0px auto; }
+#lower { height: 55px; }
+.block { height: 15px; padding: 5px; border: thin solid #ccc; text-align: center; width: 50px; float: left; }
+#a { background-color: pink; }
+#b { background-color: lightblue; }
+#c { background-color: lightgreen; }
+#d { background-color: orange; }
+#e { background-color: red; color: white; }
+#f { background-color: darkgreen; color: white; }
+#g { background-color: yellow; }
+#h { background-color: purple; color: white; }
+#output { margin: 10px auto 0px auto; width: 250px; }
+#controls { margin: 0px auto 0px auto; width: 250px; text-align: center; }
+</style>
+<a href="/users">Next</a>
+<div id="upper" class="container">
+</div>
+<div id="lower" class="container">
+<div id="a" class="block">ABCD</div>
+<div id="b" class="block">EFGH</div>
+<div id="c" class="block">IJKL</div>
+<div id="d" class="block">MNOP</div>
+<div id="e" class="block">QRST</div>
+<div id="f" class="block">UVWX</div>
+<div id="g" class="block">YZ12</div>
+<div id="h" class="block">3456</div>
+</div>
+<div id="controls">
+<a href="javascript:window.random=false;">Nice</a> | <a href="javascript:window.random=true;">Not Nice</a>
+</div>
+<div id="output"></div>
 """
 
     @cherrypy.expose
@@ -83,7 +139,7 @@ function returned(rescode) {
 function getData() {
   startReq = new Date().getTime();
   window.setTimeout("maybeFrown()", 210);
-  
+
   $.ajax({success:
           function(data, textStatus, xhr) {
             returned(textStatus);
