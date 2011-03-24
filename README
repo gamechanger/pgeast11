@@ -30,9 +30,19 @@ mongo localhost:30000
 mongo localhost:30000
 > show dbs
 > db.stats()
+> use data
+> db.thingoes.save({a: 1, b: 2, x: true})
+> db.thingoes.find()
 mongostat
 
+==> Users
+* 1 thingo!!
+
 kill -2 mongod
+
+==> Users
+* angry user!
+
 nohup mongod --port 30000 --dbpath /data/0/ --replSet node1 --logpath ~/mongo.0.log --logappend --cpu 2>&1> mongo.0.out &
 nohup mongod --port 30001 --dbpath /data/1/ --replSet node1 --logpath ~/mongo.1.log --logappend --cpu 2>&1> mongo.1.out &
 nohup mongod --port 30002 --dbpath /data/2/ --replSet node1 --logpath ~/mongo.2.log --logappend --cpu 2>&1> mongo.2.out &
@@ -46,8 +56,9 @@ m0
 > rs.add("localhost:30001")
 > rs.addArb("localhost:30002")
 > use data
-> db.thingoes.save({a: 1, b: 2, x: true})
+> db.thingoes.save({a: 7, b: 5, x: true})
 > db.thingoes.find()
+> db.thingoes.stats()
 
 m1
 > show dbs
@@ -55,9 +66,16 @@ m1
 > show collections
 > db.getMongo().setSlaveOk()
 > db.thingoes.find()
+> db.thingoes.save({a: 5, x: false})
 
-m2
-> show dbs
+m0
+> rs.status()
+
+==> Users
+* 2 thingoes!
+
+m0
+> rs.stepDown()
 
 
 
