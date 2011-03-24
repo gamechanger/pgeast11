@@ -1,6 +1,7 @@
 import os.path
 import pymongo
-conn = pymongo.Connection('mongodb://AirKiril.local:30000,AirKiril.local:30001')
+#conn = pymongo.Connection('mongodb://AirKiril.local:30000,AirKiril.local:30001')
+conn = pymongo.Connection('mongodb://AirKiril.local:40000')
 
 
 import cherrypy

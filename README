@@ -8,25 +8,26 @@ Main points: working set, indexing, infrastructure
 -----
 
 Me: KS, CTO, early-adopter.  Mongo by fire.  Python preso.
+    %% emacs buffers > context switching
 Agenda: GC, me, arch, mongo, terminal.
+    %% live code, look, no net!  I'll write javascript before your eyes!
 GC: 9p, 2y, i->o. MLB.com nerds, jobs@gc.io.  seriously.
 Me: Langs, learning, history.  hacker->nuanced/manager hacker.  DisMath=runtimes, algs, structs!!!
 Mongo: GC=(data + media), JSON, Mongo, completely insane.
-Arch: API, JSON, LAMP->NAMP?
+    %% 10gen remains 1 feature release ahead.  Barely (sharding).
+    %% urban dictionary
+Arch: API, JSON, LAMP->LNMP?
 
 Yay:
 
 team = {"name": "NYC Jaguars", "sport": "baseball"}
 mongo.datadb.team.save(team) # omg wow
 
-Next: 1 year in 30 min.  Working sets.  Understanding.
+Next: 1 year in 30 min.  Working sets.  Scaling in place.
 
 // assume /data/0,1,2,34,5,6,7,8,9, all with good permissions
 
-nohup mongod --port 30000 --dbpath /data/0/ --logpath ~/mongo.0.log --cpu 2>&1 > mongo.0.out &
-mongo localhost:30000
-// so yay, look, we have mongo running!
-// mess around a bit
+nohup mongod --port 30000 --dbpath /data/0/ --logpath ~/mongo.0.log --logappend --cpu 2>&1 >> mongo.0.log &
 mongo localhost:30000
 > show dbs
 > db.stats()
@@ -43,9 +44,9 @@ kill -2 mongod
 ==> Users
 * angry user!
 
-nohup mongod --port 30000 --dbpath /data/0/ --replSet node1 --logpath ~/mongo.0.log --logappend --cpu 2>&1> mongo.0.out &
-nohup mongod --port 30001 --dbpath /data/1/ --replSet node1 --logpath ~/mongo.1.log --logappend --cpu 2>&1> mongo.1.out &
-nohup mongod --port 30002 --dbpath /data/2/ --replSet node1 --logpath ~/mongo.2.log --logappend --cpu 2>&1> mongo.2.out &
+nohup mongod --port 30000 --dbpath /data/0/ --replSet node1 --logpath ~/mongo.0.log --logappend --cpu 2>&1>> mongo.0.log &
+nohup mongod --port 30001 --dbpath /data/1/ --replSet node1 --logpath ~/mongo.1.log --logappend --cpu 2>&1>> mongo.1.log &
+nohup mongod --port 30002 --dbpath /data/2/ --replSet node1 --logpath ~/mongo.2.log --logappend --cpu 2>&1>> mongo.2.log &
 
 alias m0="mongo localhost:30000"
 alias m1="mongo localhost:30001"
@@ -56,7 +57,7 @@ m0
 > rs.add("localhost:30001")
 > rs.addArb("localhost:30002")
 > use data
-> db.thingoes.save({a: 7, b: 5, x: true})
+> db.thingoes.save({a: 7, x: true})
 > db.thingoes.find()
 > db.thingoes.stats()
 
@@ -77,6 +78,125 @@ m0
 m0
 > rs.stepDown()
 
+m1
+> use data
+> for ( var i = 0; i < 100000; i++ ) { db.thingoes.save({a: i, x: (i%11==0)}); }
+> ""
+> ""
+
+tail -f mongo.*.log
+mongostat
+
+m1
+> use data
+> db.currentOp()
+> db.thingoes.ensureIndex({x: 1}, {background: true, sparse: true})
+
+tail -f mongo.*.log
+mongostat
+
+m1
+> use data
+> for ...
+> ""
+
+
+==> Let's shard!!
+m1
+> use data
+> db.thingoes.ensureIndex({a: 1})
+> db.thingoes.update({a: {$exists: false}}, {$set: {a: 9999}}, false, true)
+
+mkdir /data/configdb
+nohup mongod --configsvr --logpath ~/mongo.config.log --logappend --cpu 2>&1>> mongo.config.log &
+nohup mongod --port 40000 --logpath ~/mongos.log --configdb AirKiril.local:27019 &
+
+mongo localhost:40000
+> use admin
+> db.runCommand({addshard: 'node1/AirKiril.local:30000,AirKiril.local:30001'})
+> db.printShardingStatus()
+> show dbs
+> use data
+> show collections
+> db.thingoes.count()
+
+nohup mongod --port 30003 --dbpath /data/3/ --replSet node2 --logpath ~/mongo.3.log --logappend --cpu 2>&1>> mongo.3.log &
+%% NOTE: this is a dangerous replica set
+
+mongo localhost:30003
+> show dbs
+
+mongo localhost:40000
+> use admin
+> db.runCommand({addshard: 'node2/AirKiril.local:30003'})
+
+==> *oops*
+
+mongo localhost:30003
+> rs.initiate()
+> rs.status()
+
+tail mongos.log
+
+mongo localhost:40000
+> use admin
+> db.runCommand({addshard: 'node2/AirKiril.local:30003'})
+> db.printShardingStatus()
+> db.runCommand({enablesharding: 'data'})
+> db.printShardingStatus()
+> db.runCommand({shardcollection: 'data.thingoes', key: {a: 1}})
+> db.printShardingStatus()
+
+mongo localhost:30002
+> use data
+> db.thingoes.count()
+
+mongo localhost:30003
+> use data
+> db.thingoes.count()
+
+mongo localhost:40000
+> db.printShardingStatus()
+> db.runCommand({moveChunk: 'data.thingoes', find: {a: 1}, to: 'node2'})
+> db.printShardingStatus()
+
+mongo localhost:30001
+> use data
+> db.thingoes.count()
+
+mongo localhost:30003
+> use data
+> db.thingoes.count()
+
+mongo localhost:40000
+> use data
+> db.thingoes.save({x: true})
+> db.thingoes.save({x: true, a: 77})
+> db.thingoes.save({x: true, a: 777777})
+
+
+nohup mongod --port 30004 --dbpath /data/4/ --replSet node2 --logpath ~/mongo.4.log --logappend --cpu 2>&1>> mongo.4.log &
+nohup mongod --port 30005 --dbpath /data/5/ --replSet node2 --logpath ~/mongo.5.log --logappend --cpu 2>&1>> mongo.5.log &
+
+mongo localhost:30003
+> rs.add('AirKiril.local:30004')
+> rs.addArb('AirKiril.local:30005')
+> rs.status()
+
+mongo localhost:30004
+> use data
+> db.thingoes.count()
+> "" // until we see them there
+> rs.status()
+
+mongo localhost:30003
+> rs.stepDown()
+
+End Notes:
+* RAID0 EBS on EC2 is pretty fast
+  - has the advantage of being disassemblable (if needed w/in-place upgrading)
+* Sharding != panacea
+  - key distribution
 
 
 
