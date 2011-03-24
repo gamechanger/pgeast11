@@ -1,0 +1,76 @@
+
+PostGres
+
+- tell a story
+- think of the 2-3 key points (no more) that you want your audience to remember 
+
+and a lot of people have this format: 
+- tell them what you're going to tell them
+- tell them
+- tell them what you told them
+
+-----
+
+
+Hi, my name is Kiril Savino.  I'm the co-founder and CTO of GameChanger Media, and a chronic early-adopter.  My talk today is going to be a very practical one.  Over the last year and a half, I've lived through exactly what I'm going to show you:  I started off using Mongo because it made programming easier, suffered through the learning curve of a new technology (in production), suffered outages, built in redundancy, got "product-market fit", suffered outages, built in distributed storage, and now have a real business, with real traffic, running on a Mongo-based stack.  So I'm going to walk you through exactly those steps, learning how to understand performance, spot bottlenecks, slave, replicate, shard, and monitor a MongoDB installation.  It will be a lot less painful in here on my little 11" MacBook Air than it was on a cluster of EC2 nodes, live, with traffic ramping and customers with pitchforks.
+
+So: a quick intro to me & GameChanger, a little on our architecture and why we've built on Mongo, and then I'm going to just dive into a Terminal window.
+
+GameChanger 9-person startup based here in NYC, about 2 years old.  Our platform consists of two things: iOS and Android apps that let people score youth & amateur sports games, and a back-end that takes the live play-by-play feeds of their data and turns it into content streams that are consumed across the web, mobile apps, and through SMS, social networks, etc.  You can think of us as something like MLB.com (I know we're geeky here, but anybody actually a sports fan?  you can all email jobs@gc.io later.  or right now from your iPhones.) for everyone else.
+
+So why am I talking to you… my degree is in Japanese, and the only "CS" course I ever took was a summer intensive in Discrete Math.  Well, I've been lucky to work on some very big things.  I was tech lead at HigherOne, DoubleClick, ShopWiki, and Conductor before GameChanger, and built & worked on systems that process billions of $ in payments, served billions of impressions, processed hundreds of millions pages of HTML, and gobble up hundreds and hundreds of machines.
+
+Somewhere along the way, I went from hacker to… well, more experienced, nuanced, managerial hacker.
+
+We're both a data company and a media company, and at the core of that we're a distribution engine for data.  This means that from the very first days of GameChanger's life, we built on an API layer.  Our apps use our API, our own website uses our API, our partners user our API.  It's no exaggeration to call our API the beating heart of our tech stack.  We originally built this on your typical LAMP stack: Apache talking to Python (Django), with a MySQL back-end.  There was this fateful moment, however, when we realized that given that our API purely uses JSON for data representation, that we were wasting a TON of CPU and complexity dealing with an ORM layer that took our beautiful dictionary structures, converted them to Plain Old Python Objects, and then in turn created horrible gobs of SQL to put them into MySQL.  Mongo was just hitting 1.1, and I was lucky enough to know the founders personally, and so basically I said, "am I going to regret resting the future of my startup, my kids college tuition, etc. on your barely-out-of-beta technology?"  And they said maybe, and me being me, I jumped.
+
+So then, in Python (using Pymongo), persisting our data objects turned into something like this:
+
+team = {"name": "NYC Jaguars", "sport": "baseball"}
+mongo.datadb.team.save(team) # omg wow
+
+So that was a pretty big deal.  I'm really glossing over things here: it took 6 months to transition our running site across databases, and another 6 months before I spent the time to remove huge gobs of bridging code that had let us do the transition without downtime.
+
+Now I'm going to spend the next 30 minutes making 1 year of nail-biting, sleepless, hard-won scaling look really trivial.
+
+// assume /data/0,1,2,34,5,6,7,8,9, all with good permissions
+
+nohup mongod --port 30000 --dbpath /data/0/ --logpath ~/mongo.0.log --cpu 2>&1 > mongo.0.out &
+mongo localhost:30000
+// so yay, look, we have mongo running!
+// mess around a bit
+
+kill -2 mongod
+nohup mongod --port 30000 --dbpath /data/0/ --replSet node1 --logpath ~/mongo.0.log --logappend --cpu 2>&1> mongo.0.out &
+nohup mongod --port 30001 --dbpath /data/1/ --replSet node1 --logpath ~/mongo.1.log --logappend --cpu 2>&1> mongo.1.out &
+nohup mongod --port 30002 --dbpath /data/2/ --replSet node1 --logpath ~/mongo.2.log --logappend --cpu 2>&1> mongo.2.out &
+
+alias m0="mongo localhost:30000"
+alias m1="mongo localhost:30001"
+alias m2="mongo localhost:30002"
+
+m0
+> rs.initiate()
+> rs.add("localhost:30001")
+> rs.addArb("localhost:30002")
+> use fancy
+> db.stuff.save({a: 1, b: 2})
+> db.stuff.find()
+
+m1
+> show dbs
+> use fancy
+> show collections
+> db.getMongo().setSlaveOk()
+> db.stuff.find()
+
+m2
+> show dbs
+
+
+
+
+
+
+
+
