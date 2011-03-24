@@ -1,7 +1,7 @@
 import os.path
 import pymongo
-#conn = pymongo.Connection('mongodb://AirKiril.local:30000,AirKiril.local:30001')
-conn = pymongo.Connection('mongodb://AirKiril.local:40000')
+conn = pymongo.Connection('mongodb://AirKiril.local:30000,AirKiril.local:30001')
+#conn = pymongo.Connection('mongodb://AirKiril.local:40000')
 
 
 import cherrypy
@@ -11,6 +11,17 @@ class Root:
     def index(self):
         return """
 <a href="lru">Start</a>
+<div style="width:400px; margin:0px auto 0px auto; text-align: center; border: thin solid #ccc; background-color: #eee;">
+<h1>Scaling from Toys to Traffic</h1>
+<br/>
+Kiril Savino, @kirilnyc
+<br/>
+CTO, GameChanger Media.
+<br/>
+<b>www.GameChanger.io</b>
+<br/>
+jobs@gc.io
+</div>
 """
 
     @cherrypy.expose
