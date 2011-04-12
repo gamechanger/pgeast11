@@ -5,7 +5,7 @@ nohup mongod --port 30002 --dbpath /data/2/ --replSet node1 --logpath ~/mongo.2.
 
 
 nohup mongod --configsvr --logpath ~/mongo.config.log --logappend --cpu 2>&1>> ~/mongo.config.log &
-nohup mongod --port 40000 --logpath ~/mongos.log --configdb AirKiril.local:27019 2>&1>> ~/mongos.log &
+nohup mongos --port 40000 --logpath ~/mongos.log --configdb AirKiril.local:27019 2>&1>> ~/mongos.log &
 
 
 nohup mongod --port 30003 --dbpath /data/3/ --replSet node2 --logpath ~/mongo.3.log --logappend 2>&1>> mongo.3.log &

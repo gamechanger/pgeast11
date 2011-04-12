@@ -13,14 +13,15 @@ class Root:
 <a href="/simple">OMG WOW</a>
 <div style="width:400px; margin:0px auto 0px auto; text-align: center; border: thin solid #ccc; background-color: #eee;">
 <h1>Scaling from Toys to Traffic</h1>
-<br/>
 Kiril Savino, @kirilnyc
 <br/>
-CTO, GameChanger Media.
+CTO, GameChanger Media, Inc.
 <br/>
 <b>www.GameChanger.io</b>
 <br/>
-jobs@gc.io
+&raquo; jobs@gc.io &laquo;
+<br/>
+"slides": http://github.com/kiril/pgeast11
 </div>
 """
 
@@ -196,8 +197,10 @@ function stopPolling() {
   on = false;
 }
 </script>
-<a href="javascript:startPolling();">start</a>
+<a href="javascript:startPolling();">start</a> |
 <a href="javascript:stopPolling();">stop</a>
+<br/>
+<a href="/">Okay then</a>
         """
 
     @cherrypy.expose
