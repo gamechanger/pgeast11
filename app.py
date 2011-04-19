@@ -16,11 +16,14 @@ class Root:
 <a href="/simple">OMG WOW</a>
 <div style="width:400px; margin:0px auto 0px auto; text-align: center; border: thin solid #ccc; background-color: #eee;">
 <h1>Scaling from Toys to Traffic</h1>
-Kiril Savino, @kirilnyc
+<h3 style="margin-bottom: 5px;">Kiril Savino, @kirilnyc</h3>
 <br/>
 CTO, GameChanger Media, Inc.
 <br/>
-<b>www.GameChanger.io</b>
+<div>
+<img src="gc.png"/>
+</div>
+<b> www.GameChanger.io</b>
 <br/>
 &raquo; jobs@gc.io &laquo;
 <br/>
