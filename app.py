@@ -1,6 +1,9 @@
 import os.path
 import pymongo
-conn = pymongo.Connection('mongodb://AirKiril.local:30000,AirKiril.local:30001')
+from pymongo.errors import AutoReconnect
+#host = "AirKiril.local"
+host = "iMac27.local"
+conn = pymongo.Connection('mongodb://%s:30000,%s:30001' % (host,host))
 #conn = pymongo.Connection('mongodb://AirKiril.local:40000')
 
 
@@ -62,14 +65,14 @@ mongo.datadb.team.save(team) # omg wow
 <div id="upper" class="container">
 </div>
 <div id="lower" class="container">
-<div id="a" class="block">A</div>
-<div id="b" class="block">B</div>
-<div id="c" class="block">C</div>
-<div id="d" class="block">D</div>
-<div id="e" class="block">E</div>
-<div id="f" class="block">F</div>
-<div id="g" class="block">G</div>
-<div id="h" class="block">H</div>
+<div id="A" class="block">A</div>
+<div id="B" class="block">B</div>
+<div id="C" class="block">C</div>
+<div id="D" class="block">D</div>
+<div id="E" class="block">E</div>
+<div id="F" class="block">F</div>
+<div id="G" class="block">G</div>
+<div id="H" class="block">H</div>
 </div>
 <div id="controls">
 <a href="javascript:iterateLater()">Start</a> | <a href="javascript:window.random=false;">Nice</a> | <a href="javascript:window.random=true;">Not Nice</a>
@@ -86,14 +89,14 @@ mongo.datadb.team.save(team) # omg wow
 .container { background-color: #eee; border: thin solid #ccc; height: 35px; padding: 10px; width: 250px; margin: 0px auto 0px auto; }
 #lower { height: 55px; }
 .block { height: 15px; padding: 5px; border: thin solid #ccc; text-align: center; width: 50px; float: left; }
-#a { background-color: pink; }
-#b { background-color: lightblue; }
-#c { background-color: lightgreen; }
-#d { background-color: orange; }
-#e { background-color: red; color: white; }
-#f { background-color: darkgreen; color: white; }
-#g { background-color: yellow; }
-#h { background-color: purple; color: white; }
+#A { background-color: pink; }
+#B { background-color: lightblue; }
+#C { background-color: lightgreen; }
+#D { background-color: orange; }
+#E { background-color: red; color: white; }
+#F { background-color: darkgreen; color: white; }
+#G { background-color: yellow; }
+#H { background-color: purple; color: white; }
 #output { margin: 10px auto 0px auto; width: 250px; }
 #controls { margin: 0px auto 0px auto; width: 250px; text-align: center; }
 </style>
@@ -101,14 +104,14 @@ mongo.datadb.team.save(team) # omg wow
 <div id="upper" class="container">
 </div>
 <div id="lower" class="container">
-<div id="a" class="block">ABCD</div>
-<div id="b" class="block">EFGH</div>
-<div id="c" class="block">IJKL</div>
-<div id="d" class="block">MNOP</div>
-<div id="e" class="block">QRST</div>
-<div id="f" class="block">UVWX</div>
-<div id="g" class="block">YZ12</div>
-<div id="h" class="block">3456</div>
+<div id="A" class="block">ABCD</div>
+<div id="B" class="block">EFGH</div>
+<div id="C" class="block">IJKL</div>
+<div id="D" class="block">MNOP</div>
+<div id="E" class="block">QRST</div>
+<div id="F" class="block">UVWX</div>
+<div id="G" class="block">YZ12</div>
+<div id="H" class="block">3456</div>
 </div>
 <div id="controls">
 <a href="javascript:iterateLater()">Start</a> | <a href="javascript:window.random=false;">Nice</a> | <a href="javascript:window.random=true;">Not Nice</a>
@@ -205,7 +208,13 @@ function stopPolling() {
 
     @cherrypy.expose
     def poll(self):
-        return "%s" % conn.data.thingoes.find({'x': True}).count()
+        while True:
+            try:
+                return "%s" % conn.data.thingoes.find({'x': True}).count()
+            except AutoReconnect:
+                continue
+            except:
+                break
 
 if __name__ == '__main__':
     current_dir = os.path.dirname(os.path.abspath(__file__))

@@ -1,4 +1,4 @@
-letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
+letters = ["A", "B", "C", "D", "E", "F", "G", "H"];
 random = false;
 on = true;
 
@@ -9,11 +9,13 @@ function isLoaded(letter) {
 }
 
 function loadBlock(letter) {
-    $("#output").append(" "+letter);
-    if ( ! isLoaded(letter) ) {
-        $("#output").append("<span style='color:red;font-weight:bold;'>!</span>");
+    var bad = ! isLoaded(letter);
+    var style = "background-color:lightgreen;color:black;"
+    if ( bad )
+        style = "background-color:pink;color:red;font-weight:bold;"
+    $("#output").append("<span style='"+style+"'>" + " " + letter + "</span>");
+    if ( bad )
         loaded_blocks.splice(0,0,letter);
-    }
     $("#upper").prepend($("#"+letter));
     for ( var i = 4; i < loaded_blocks.length; i++ ) {
         $("#lower").append($("#"+loaded_blocks[i]));

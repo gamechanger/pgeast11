@@ -1,5 +1,5 @@
-letters = ["a", "b", "c", "d", "e", "f", "g", "h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","1","2","3","4","5","6"];
-buckets = ["a", "b", "c", "d", "e", "f", "g", "h"]
+letters = ["A", "B", "C", "D", "E", "F", "G", "H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","1","2","3","4","5","6"];
+buckets = ["A", "B", "C", "D", "E", "F", "G", "H"]
 random = false;
 on = true;
 
@@ -10,12 +10,14 @@ function isLoaded(letter) {
 }
 
 function loadBlock(letter) {
-    $("#output").append(" "+letter);
     var bucket = buckets[Math.floor(letters.indexOf(letter)/4)];
-    if ( ! isLoaded(bucket) ) {
-        $("#output").append("<span style='color:red;font-weight:bold;'>!</span>");
+    var bad = ! isLoaded(bucket);
+    var style = "background-color:lightgreen;color:black;"
+    if ( bad )
+        style = "background-color:pink;color:red;font-weight:bold;"
+    $("#output").append("<span style='"+style+"'>" + " " + letter + "</span>");
+    if ( bad )
         loaded_blocks.splice(0,0,bucket);
-    }
     $("#upper").prepend($("#"+bucket));
     for ( var i = 4; i < loaded_blocks.length; i++ ) {
         $("#lower").append($("#"+loaded_blocks[i]));
