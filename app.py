@@ -1,15 +1,17 @@
 import os.path
 import pymongo
 from pymongo.errors import AutoReconnect
-#host = "AirKiril.local"
-host = "iMac27.local"
-conn = pymongo.Connection('mongodb://%s:30000,%s:30001' % (host,host))
-#conn = pymongo.Connection('mongodb://AirKiril.local:40000')
+host = "AirKiril.local"
+#host = "iMac27.local"
+mongostring = 'mongodb://%s:30000,%s:30001' % (host,host)
+#mongostring = 'mongodb://%s:40000' % host
 
 
 import cherrypy
 
 class Root:
+    conn = None
+
     @cherrypy.expose
     def index(self):
         return """
@@ -211,9 +213,11 @@ function stopPolling() {
 
     @cherrypy.expose
     def poll(self):
+        if not self.conn:
+            self.conn = pymongo.Connection(mongostring)
         while True:
             try:
-                return "%s" % conn.data.thingoes.find({'x': True}).count()
+                return "%s" % self.conn.data.thingoes.find({'x': True}).count()
             except AutoReconnect:
                 continue
             except:
